@@ -66,6 +66,8 @@ pipeline {
             steps {
                 sh '''
                     docker pull ${IMAGE_NAME}:${GIT_SHA}
+                    rm -f previous_image.txt
+                    docker inspect ${CONTAINER_NAME} --format='{{.Config.Image}}' > previous_image.txt 2>/dev/null || true
 
                     docker stop ${CONTAINER_NAME} || true
                     docker rm ${CONTAINER_NAME} || true
@@ -102,6 +104,21 @@ pipeline {
         }
 
         failure {
+            sh '''
+                if [ -s previous_image.txt ]; then
+                    docker stop ${CONTAINER_NAME} || true
+                    docker rm ${CONTAINER_NAME} || true
+                    docker run -d \
+                      --name ${CONTAINER_NAME} \
+                      --memory 512m \
+                      --cpus 0.5 \
+                      -p ${APP_PORT}:${CONTAINER_PORT} \
+                      $(cat previous_image.txt)
+                    echo "Rollback completed successfully."
+                else
+                    echo "No previous image available for rollback."
+                fi
+            '''
             echo 'CI/CD pipeline failed.'
         }
     }
