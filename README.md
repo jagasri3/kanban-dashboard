@@ -1,74 +1,74 @@
-# React + TypeScript + Vite
+# Kanban Dashboard
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A Kanban-style task management application built with React, TypeScript and Vite.
 
-Currently, two official plugins are available:
+## Technology Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- React
+- TypeScript
+- Vite
+- Docker
+- Nginx
+- Jenkins
+- GitHub
+- Docker Hub
+- AWS EC2
 
-## React Compiler
+## Docker
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+The application is containerized using Docker and served through Nginx.
 
-## Expanding the ESLint configuration
+Docker images are tagged using the Git commit SHA, for example:
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+`jagasri2026/kanban-dashboard:f938bce`
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+The container uses:
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+- Memory limit: 512 MB
+- CPU limit: 0.5 CPU
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## CI/CD Pipeline
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Jenkins automatically performs the following stages:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+1. Checkout source code from GitHub
+2. Generate Git commit SHA
+3. Build the Docker image
+4. Login to Docker Hub
+5. Push the versioned Docker image
+6. Deploy the image to AWS EC2
+7. Perform application health checks
+8. Mark the pipeline as successful or failed
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
-GitHub webhook test
+## GitHub Webhook
+
+A GitHub webhook is configured to trigger Jenkins automatically whenever code is pushed to the repository.
+
+Flow:
+
+GitHub Push → Webhook → Jenkins Pipeline → Docker Build → Docker Hub → EC2 Deployment
+
+## Health Checks
+
+The deployment validates:
+
+- Docker container is running
+- Docker HEALTHCHECK reports `healthy`
+- Application endpoint responds successfully
+
+## Deployment
+
+The application is deployed on an AWS EC2 instance using Docker.
+
+Application:
+
+`http://65.2.75.198:8081`
+
+## Monitoring
+
+Docker logs, container status and health status can be checked using:
+
+```bash
+sudo docker ps
+sudo docker logs kanban-dashboard
+sudo docker inspect kanban-dashboard
