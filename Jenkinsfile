@@ -88,7 +88,7 @@ pipeline {
                     sleep 10
 
                     curl --fail \
-                      http://127.0.0.1:${APP_PORT}/rollback-test-fail \
+                      http://127.0.0.1:${APP_PORT}/ \
                       > /dev/null
 
                     docker ps --filter "name=${CONTAINER_NAME}" \
