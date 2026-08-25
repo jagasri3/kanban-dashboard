@@ -72,6 +72,8 @@ pipeline {
 
                     docker run -d \
                       --name ${CONTAINER_NAME} \
+                      --memory 512m \
+                      --cpus 0.5 \
                       -p ${APP_PORT}:${CONTAINER_PORT} \
                       ${IMAGE_NAME}:${GIT_SHA}
                 '''
